@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin | Shinseikan Karate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Serif+JP:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+  </head>
+
+  <body class="admin-body">
+    <header class="site-header admin-header">
+      <div class="container header-inner">
+        <a class="brand" href="../" aria-label="Volver al sitio">
+          <img id="adminLogo" class="brand-logo" alt="Shinseikan Karate" />
+          <div class="brand-text">
+            <span class="brand-name">Panel Admin</span>
+            <span class="brand-tagline">Shinseikan Karate</span>
+          </div>
+        </a>
+        <div class="admin-header-actions">
+          <button class="btn btn-ghost btn-small" id="btnLogout" type="button">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <div class="container">
+        <section class="admin-login card" id="loginPanel">
+          <h1 class="section-title">Acceso</h1>
+          <p class="section-lead">Ingresá para editar textos, imágenes y productos (se guarda en este dispositivo).</p>
+          <form id="loginForm" class="form">
+            <div class="form-row">
+              <label for="u">Usuario</label>
+              <input id="u" name="u" autocomplete="username" required />
+            </div>
+            <div class="form-row">
+              <label for="p">Contraseña</label>
+              <input id="p" name="p" type="password" autocomplete="current-password" required />
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Entrar</button>
+              <p class="form-note" id="loginError" role="alert" hidden></p>
+            </div>
+          </form>
+        </section>
+
+        <section id="adminPanel" hidden>
+          <div class="admin-top">
+            <div class="admin-intro">
+              <h1 class="section-title">Administración</h1>
+              <p class="section-lead">
+                Cambios guardados en <code>localStorage</code>. Para verlos en la landing, recargá <code>/</code>.
+              </p>
+            </div>
+            <div class="admin-actions">
+              <button class="btn btn-dark" id="btnSaveAll" type="button">Guardar cambios</button>
+              <button class="btn btn-ghost" id="btnReset" type="button">Restaurar defaults</button>
+            </div>
+          </div>
+
+          <div class="admin-layout">
+            <aside class="admin-nav card" aria-label="Secciones del panel">
+              <button class="admin-tab" data-tab="tabBrand" type="button">Marca & contacto</button>
+              <button class="admin-tab" data-tab="tabLanding" type="button">Textos landing</button>
+              <button class="admin-tab" data-tab="tabMedia" type="button">Logo & medios</button>
+              <button class="admin-tab" data-tab="tabDisciplines" type="button">Disciplinas</button>
+              <button class="admin-tab" data-tab="tabClasses" type="button">Clases</button>
+              <button class="admin-tab" data-tab="tabShop" type="button">Shop (KAI)</button>
+              <button class="admin-tab" data-tab="tabBlocks" type="button">Bloques extra</button>
+              <button class="admin-tab" data-tab="tabBackup" type="button">Backup</button>
+            </aside>
+
+            <section class="admin-content card" id="tabBrand" hidden>
+              <h2 class="card-title">Marca & contacto</h2>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="brand_name">Nombre</label>
+                  <input id="brand_name" />
+                </div>
+                <div class="form-row">
+                  <label for="brand_tagline">Descripción</label>
+                  <input id="brand_tagline" />
+                </div>
+                <div class="form-row">
+                  <label for="sensei_name">Sensei principal</label>
+                  <input id="sensei_name" />
+                </div>
+                <div class="form-row">
+                  <label for="whatsapp_phone">WhatsApp (solo números, con país)</label>
+                  <input id="whatsapp_phone" placeholder="543516742868" />
+                </div>
+                <div class="form-row">
+                  <label for="address_full">Dirección</label>
+                  <input id="address_full" />
+                </div>
+                <div class="form-row">
+                  <label for="maps_url">Link “Abrir en Maps”</label>
+                  <input id="maps_url" />
+                </div>
+                <div class="form-row">
+                  <label for="maps_embed">Embed (iframe src)</label>
+                  <input id="maps_embed" />
+                </div>
+              </div>
+            </section>
+
+            <section class="admin-content card" id="tabLanding" hidden>
+              <h2 class="card-title">Textos landing</h2>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="hero_kicker">Hero kicker</label>
+                  <input id="hero_kicker" />
+                </div>
+                <div class="form-row">
+                  <label for="hero_title">Frase principal</label>
+                  <input id="hero_title" />
+                </div>
+                <div class="form-row">
+                  <label for="hero_subtitle">Subtítulo</label>
+                  <textarea id="hero_subtitle" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                  <label for="hero_bullets">Bullets (1 por línea)</label>
+                  <textarea id="hero_bullets" rows="4"></textarea>
+                </div>
+                <div class="form-row">
+                  <label for="hero_primary_cta">Botón 1</label>
+                  <input id="hero_primary_cta" />
+                </div>
+                <div class="form-row">
+                  <label for="hero_secondary_cta">Botón 2</label>
+                  <input id="hero_secondary_cta" />
+                </div>
+                <div class="form-row">
+                  <label for="about_title">Título “Sobre”</label>
+                  <input id="about_title" />
+                </div>
+                <div class="form-row">
+                  <label for="about_lead">Sobre (bajada)</label>
+                  <input id="about_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="about_b1_title">Sobre — bloque 1 (título)</label>
+                  <input id="about_b1_title" />
+                </div>
+                <div class="form-row">
+                  <label for="about_b1_text">Sobre — bloque 1 (texto)</label>
+                  <textarea id="about_b1_text" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                  <label for="about_b2_title">Sobre — bloque 2 (título)</label>
+                  <input id="about_b2_title" />
+                </div>
+                <div class="form-row">
+                  <label for="about_b2_text">Sobre — bloque 2 (texto)</label>
+                  <textarea id="about_b2_text" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                  <label for="about_b3_title">Sobre — bloque 3 (título)</label>
+                  <input id="about_b3_title" />
+                </div>
+                <div class="form-row">
+                  <label for="about_b3_text">Sobre — bloque 3 (texto)</label>
+                  <textarea id="about_b3_text" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                  <label for="disciplines_lead">Disciplinas (bajada)</label>
+                  <input id="disciplines_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="classes_lead">Clases (bajada)</label>
+                  <input id="classes_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="classes_days">Días</label>
+                  <input id="classes_days" />
+                </div>
+                <div class="form-row">
+                  <label for="belts_lead">Cintos (bajada)</label>
+                  <input id="belts_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="shop_lead">Shop (bajada)</label>
+                  <input id="shop_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="location_lead">Ubicación (bajada)</label>
+                  <input id="location_lead" />
+                </div>
+                <div class="form-row">
+                  <label for="form_lead">Formulario (bajada)</label>
+                  <input id="form_lead" />
+                </div>
+              </div>
+            </section>
+
+            <section class="admin-content card" id="tabMedia" hidden>
+              <h2 class="card-title">Logo & medios</h2>
+              <p class="card-text">
+                El logo se guarda como imagen en <code>localStorage</code> (ideal PNG/SVG liviano). Si es muy grande, puede no
+                guardar por límite de almacenamiento del navegador.
+              </p>
+              <div class="media-grid">
+                <div class="media-preview">
+                  <img id="logoPreview" alt="Vista previa del logo" />
+                </div>
+                <div class="media-actions">
+                  <div class="form-row">
+                    <label for="logoFile">Subir logo</label>
+                    <input id="logoFile" type="file" accept="image/*" />
+                  </div>
+                  <div class="form-row">
+                    <label for="logoAlt">Alt del logo</label>
+                    <input id="logoAlt" />
+                  </div>
+                  <button class="btn btn-ghost" id="btnClearLogo" type="button">Quitar logo</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="admin-content card" id="tabDisciplines" hidden>
+              <h2 class="card-title">Disciplinas</h2>
+              <div id="disciplinesEditor" class="stack"></div>
+              <button class="btn btn-ghost" id="btnAddDiscipline" type="button">+ Agregar disciplina</button>
+            </section>
+
+            <section class="admin-content card" id="tabClasses" hidden>
+              <h2 class="card-title">Clases (grupos)</h2>
+              <div id="classesEditor" class="stack"></div>
+              <button class="btn btn-ghost" id="btnAddClassGroup" type="button">+ Agregar grupo</button>
+            </section>
+
+            <section class="admin-content card" id="tabShop" hidden>
+              <h2 class="card-title">Shop (KAI)</h2>
+              <p class="card-text">Editá productos, imágenes y variantes (talle/color/precio).</p>
+              <div id="productsEditor" class="stack"></div>
+              <button class="btn btn-ghost" id="btnAddProduct" type="button">+ Agregar producto</button>
+            </section>
+
+            <section class="admin-content card" id="tabBlocks" hidden>
+              <h2 class="card-title">Bloques extra</h2>
+              <p class="card-text">
+                Agregá secciones simples con título + texto. Se muestran en la landing debajo de “Disciplinas”.
+              </p>
+              <div id="blocksEditor" class="stack"></div>
+              <button class="btn btn-ghost" id="btnAddBlock" type="button">+ Agregar bloque</button>
+            </section>
+
+            <section class="admin-content card" id="tabBackup" hidden>
+              <h2 class="card-title">Backup</h2>
+              <div class="grid-2">
+                <div>
+                  <h3 class="card-title">Exportar</h3>
+                  <p class="card-text">Descargá un JSON con toda la configuración (recomendado antes de cambios grandes).</p>
+                  <button class="btn btn-dark" id="btnExport" type="button">Descargar JSON</button>
+                </div>
+                <div>
+                  <h3 class="card-title">Importar</h3>
+                  <p class="card-text">Cargá un JSON exportado previamente.</p>
+                  <input id="importFile" type="file" accept="application/json" />
+                  <p class="form-note" id="importHint">Al importar, se reemplaza la configuración actual.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/admin.js"></script>
+  </body>
+</html>

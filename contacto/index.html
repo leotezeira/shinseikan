@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>Contacto | Shinseikan Karate</title>
+    <meta name="description" content="Contacto y ubicación del Dojo Shinseikan Karate en Córdoba." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Serif+JP:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header" id="top">
+      <div class="container header-inner">
+        <a class="brand" href="../" aria-label="Ir al inicio">
+          <img id="brandLogo" class="brand-logo" alt="Shinseikan Karate" />
+          <div class="brand-text">
+            <span id="brandName" class="brand-name">Shinseikan Karate</span>
+            <span id="brandTagline" class="brand-tagline">Asociación de Okinawa Karate Do</span>
+          </div>
+        </a>
+        <nav class="nav" aria-label="Navegación principal">
+          <a href="../dojo/">Dojo</a>
+          <a href="../shop/">Shop KAI</a>
+          <a href="./">Contacto</a>
+          <a class="nav-cta" href="../dojo/#inscripcion">Inscribite</a>
+        </nav>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobileNav">
+          <span class="sr-only">Abrir menú</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div id="mobileNav" class="mobile-nav" hidden>
+        <a href="../dojo/">Dojo</a>
+        <a href="../shop/">Shop KAI</a>
+        <a href="./">Contacto</a>
+        <a href="../dojo/#inscripcion">Inscribite</a>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="section" id="ubicacion">
+        <div class="container">
+          <div class="section-head reveal">
+            <h1 class="section-title">Contacto</h1>
+            <p class="section-lead" id="locationLead">Carlos Tejedor 1165, Córdoba, Argentina (Barrio San Vicente)</p>
+          </div>
+
+          <div class="location-grid">
+            <div class="location-card card reveal">
+              <h2 class="card-title">WhatsApp</h2>
+              <p class="card-text">Consultas, inscripción y encargos.</p>
+              <div class="location-actions">
+                <a class="btn btn-primary" id="locationWaCta" href="#" rel="noopener">Escribir por WhatsApp</a>
+                <a class="btn btn-dark" id="mapsCta" href="#" target="_blank" rel="noopener">Abrir en Maps</a>
+              </div>
+              <dl class="mini-list" aria-label="Datos">
+                <div>
+                  <dt>Tel / WhatsApp</dt>
+                  <dd>
+                    <a id="waFooterLink" href="#" rel="noopener"><span id="waPhoneFooterText">+54 351 6742868</span></a>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Dirección</dt>
+                  <dd id="locationAddress">Carlos Tejedor 1165, Córdoba, Argentina</dd>
+                </div>
+                <div>
+                  <dt>Días</dt>
+                  <dd id="locationDays">Lunes a Sábados</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="map reveal">
+              <iframe
+                id="mapFrame"
+                title="Mapa del dojo"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <p class="footer-name" id="footerName">Shinseikan Karate</p>
+          <p class="footer-sub" id="footerSub">Asociación de Okinawa Karate Do</p>
+        </div>
+        <div class="footer-links">
+          <a href="../">Inicio</a>
+          <a href="../dojo/">Dojo</a>
+          <a href="../shop/">Shop KAI</a>
+        </div>
+        <div class="footer-meta">
+          <p class="footer-small" id="footerCopy">© <span id="year"></span> Shinseikan Karate</p>
+          <p class="footer-small"><span id="footerAddress">Carlos Tejedor 1165, Córdoba</span></p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/site.js"></script>
+  </body>
+</html>
+
