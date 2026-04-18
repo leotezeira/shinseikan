@@ -27,6 +27,7 @@
 
 html { 
   scroll-behavior: smooth; 
+  overflow-x: hidden; 
 } 
 
 body { 
@@ -455,6 +456,17 @@ code {
     rgba(200, 162, 74, 0.06) 55%, 
     transparent 70% 
   ); 
+} 
+
+@media (max-width: 680px) { 
+  .hero-grid { 
+    inset: 0; 
+    transform: none; 
+  } 
+  .hero-sun { 
+    right: 50%; 
+    transform: translateX(50%); 
+  } 
 } 
 
 /* Home hero (referencia) */ 
