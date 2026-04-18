@@ -25,6 +25,12 @@
     else logo.src = Shinseikan.defaultLogoDataUrl();
     logo.alt = data.brand.logoAlt || data.brand.name || "Logo";
 
+    var topLogo = qs("#topLogo");
+    if (topLogo) {
+      topLogo.src = logo.src;
+      topLogo.alt = logo.alt;
+    }
+
     var adminLogo = qs("#adminLogo");
     if (adminLogo) {
       adminLogo.src = logo.src;
