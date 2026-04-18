@@ -429,5 +429,18 @@
   document.addEventListener("DOMContentLoaded", function () {
     var data = Shinseikan.Storage.load();
     render(data);
+
+    // Header shadow on scroll
+    (function () {
+      var header = document.querySelector(".site-header");
+      if (!header) return;
+      window.addEventListener(
+        "scroll",
+        function () {
+          header.classList.toggle("scrolled", window.scrollY > 12);
+        },
+        { passive: true }
+      );
+    })();
   });
 })();
