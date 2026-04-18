@@ -233,24 +233,26 @@
     });
   }
 
-  function setupNav() {
-    var toggle = qs(".nav-toggle");
-    var mobile = qs("#mobileNav");
-    if (!toggle || !mobile) return;
-
-    toggle.addEventListener("click", function () {
-      var open = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", open ? "false" : "true");
-      mobile.hidden = open;
-    });
-
-    qsa("#mobileNav a").forEach(function (a) {
-      a.addEventListener("click", function () {
-        toggle.setAttribute("aria-expanded", "false");
-        mobile.hidden = true;
-      });
-    });
-  }
+  function setupNav() { 
+    var toggle = qs(".nav-toggle"); 
+    var mobile = qs("#mobileNav"); 
+    if (!toggle || !mobile) return; 
+ 
+    toggle.addEventListener("click", function () { 
+      var open = toggle.getAttribute("aria-expanded") === "true"; 
+      toggle.setAttribute("aria-expanded", open ? "false" : "true"); 
+      mobile.classList.toggle("is-open", !open); 
+      mobile.setAttribute("aria-hidden", open ? "true" : "false"); 
+    }); 
+ 
+    qsa("#mobileNav a").forEach(function (a) { 
+      a.addEventListener("click", function () { 
+        toggle.setAttribute("aria-expanded", "false"); 
+        mobile.classList.remove("is-open"); 
+        mobile.setAttribute("aria-hidden", "true"); 
+      }); 
+    }); 
+  } 
 
   function setupReveal() {
     var els = qsa(".reveal");

@@ -27,7 +27,6 @@
 
 html { 
   scroll-behavior: smooth; 
-  overflow-x: hidden; 
 } 
 
 body { 
@@ -37,7 +36,6 @@ body {
   font-family: var(--font); 
   line-height: 1.65; 
   color: var(--text); 
-  overflow-x: hidden; 
 } 
 
 img {
@@ -62,8 +60,11 @@ code {
 }
 
 .container { 
-  width: min(var(--container), calc(100% - 40px)); 
+  width: 100%; 
+  max-width: var(--container); 
   margin: 0 auto; 
+  padding-left: 20px; 
+  padding-right: 20px; 
 } 
 
 .sr-only {
@@ -237,15 +238,25 @@ code {
   top: 6px;
 }
 
-.mobile-nav {
-  border-top: 1px solid var(--border);
-  padding: 12px 0;
-}
-.mobile-nav a {
-  display: block;
-  padding: 12px 20px;
-  color: var(--text);
-}
+.mobile-nav { 
+  border-top: 1px solid var(--border); 
+  padding: 12px 0; 
+  overflow: hidden; 
+  max-height: 0; 
+  opacity: 0; 
+  transform: translateY(-6px); 
+  transition: max-height 0.28s ease, opacity 0.2s ease, transform 0.28s ease; 
+} 
+.mobile-nav.is-open { 
+  max-height: 320px; 
+  opacity: 1; 
+  transform: translateY(0); 
+} 
+.mobile-nav a { 
+  display: block; 
+  padding: 12px 20px; 
+  color: var(--text); 
+} 
 .mobile-nav a:hover { 
   background: rgba(255,255,255,0.06); 
 } 
@@ -428,45 +439,34 @@ code {
   box-shadow: 0 0 0 2px rgba(200, 162, 74, 0.1);
 }
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
+.hero-bg { 
+  position: absolute; 
+  inset: 0; 
+  pointer-events: none; 
+  overflow: hidden; 
+} 
 .hero-grid { 
   position: absolute; 
-  inset: -40px; 
-  opacity: 0.09; 
-  background-image: linear-gradient(var(--border) 1px, transparent 1px), 
-    linear-gradient(90deg, var(--border) 1px, transparent 1px); 
+  inset: 0; 
+  opacity: 0.08; 
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 72px 72px; 
-  transform: skewY(-6deg); 
-  transform-origin: top left; 
 } 
 .hero-sun { 
-  position: absolute;
-  right: -160px;
-  top: -160px;
-  width: 420px;
-  height: 420px;
-  border-radius: 999px;
+  position: absolute; 
+  left: 50%; 
+  top: -220px; 
+  width: 420px; 
+  height: 420px; 
+  border-radius: 999px; 
+  transform: translateX(-50%); 
   background: radial-gradient( 
     circle at 30% 30%, 
     rgba(193, 18, 31, 0.14), 
     rgba(200, 162, 74, 0.06) 55%, 
     transparent 70% 
   ); 
-} 
-
-@media (max-width: 680px) { 
-  .hero-grid { 
-    inset: 0; 
-    transform: none; 
-  } 
-  .hero-sun { 
-    right: 50%; 
-    transform: translateX(50%); 
-  } 
 } 
 
 /* Home hero (referencia) */ 
@@ -1088,6 +1088,9 @@ code {
     transition: none; 
   } 
   .btn { 
+    transition: none; 
+  } 
+  .mobile-nav { 
     transition: none; 
   } 
   .home .logo-hero-spin { 
