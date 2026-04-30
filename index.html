@@ -54,7 +54,11 @@
     </header>
 
     <main id="contenido">
-      <section class="hero">
+      <!-- Contenedor para renderizado por bloques (nuevo formato) -->
+      <div id="mainContent"></div>
+      
+      <!-- Contenido legacy (se usa si no hay pageBlocks) -->
+      <section class="hero" id="heroLegacy">
         <div class="container hero-inner">
           <div class="hero-copy reveal">
             <p class="hero-kicker" id="heroKicker">Okinawa Karate Do</p>
@@ -125,6 +129,7 @@
           </div>
         </div>
       </section>
+      <!-- Fin contenido legacy -->
     </main>
 
     <footer class="site-footer">

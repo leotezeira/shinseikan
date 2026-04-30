@@ -7,9 +7,168 @@
   var KEY = "shinseikan_site_v1";
   var AUTH_KEY = "shinseikan_admin_authed_v1";
 
+  // Estructura de bloques para el Editor Visual
+  // Cada bloque tiene: id, type, props, styles (opcional), meta (opcional)
+  function convertLegacyToBlocks(data) {
+    var blocks = [];
+    
+    // Hero block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "hero",
+      props: {
+        kicker: data.landing.heroKicker || "",
+        title: data.landing.heroTitle || "",
+        subtitle: data.landing.heroSubtitle || "",
+        primaryCta: data.landing.heroPrimaryCta || "",
+        secondaryCta: data.landing.heroSecondaryCta || "",
+        bullets: data.landing.heroBullets || []
+      },
+      styles: {}
+    });
+    
+    // About block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "about",
+      props: {
+        title: data.landing.aboutTitle || "",
+        lead: data.landing.aboutLead || "",
+        blocks: data.landing.aboutBlocks || []
+      },
+      styles: {}
+    });
+    
+    // Disciplines block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "disciplines",
+      props: {
+        lead: data.landing.disciplinesLead || "",
+        items: data.landing.disciplines || []
+      },
+      styles: {}
+    });
+    
+    // Classes block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "classes",
+      props: {
+        lead: data.landing.classesLead || "",
+        days: data.landing.classesDays || "",
+        groups: data.landing.classGroups || []
+      },
+      styles: {}
+    });
+    
+    // Belts block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "belts",
+      props: {
+        lead: data.landing.beltsLead || "",
+        items: data.landing.belts || []
+      },
+      styles: {}
+    });
+    
+    // Location block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "location",
+      props: {
+        lead: data.landing.locationLead || "",
+        address: data.contact.address || "",
+        mapsEmbed: data.contact.mapsEmbed || ""
+      },
+      styles: {}
+    });
+    
+    // Contact form block
+    blocks.push({
+      id: Shinseikan.uid(),
+      type: "contact",
+      props: {
+        lead: data.landing.formLead || "",
+        whatsappPhone: data.contact.whatsappPhone || ""
+      },
+      styles: {}
+    });
+    
+    // Extra blocks (legacy)
+    if (data.extraBlocks && Array.isArray(data.extraBlocks)) {
+      data.extraBlocks.forEach(function(b) {
+        blocks.push({
+          id: b.id || Shinseikan.uid(),
+          type: "text",
+          props: {
+            title: b.title || "",
+            text: b.text || ""
+          },
+          styles: {}
+        });
+      });
+    }
+    
+    return blocks;
+  }
+  
+  function convertBlocksToLegacy(blocks, data) {
+    // Convierte bloques de vuelta al formato legacy para compatibilidad
+    blocks.forEach(function(block) {
+      switch(block.type) {
+        case "hero":
+          data.landing.heroKicker = block.props.kicker || "";
+          data.landing.heroTitle = block.props.title || "";
+          data.landing.heroSubtitle = block.props.subtitle || "";
+          data.landing.heroPrimaryCta = block.props.primaryCta || "";
+          data.landing.heroSecondaryCta = block.props.secondaryCta || "";
+          data.landing.heroBullets = block.props.bullets || [];
+          break;
+        case "about":
+          data.landing.aboutTitle = block.props.title || "";
+          data.landing.aboutLead = block.props.lead || "";
+          data.landing.aboutBlocks = block.props.blocks || [];
+          break;
+        case "disciplines":
+          data.landing.disciplinesLead = block.props.lead || "";
+          data.landing.disciplines = block.props.items || [];
+          break;
+        case "classes":
+          data.landing.classesLead = block.props.lead || "";
+          data.landing.classesDays = block.props.days || "";
+          data.landing.classGroups = block.props.groups || [];
+          break;
+        case "belts":
+          data.landing.beltsLead = block.props.lead || "";
+          data.landing.belts = block.props.items || [];
+          break;
+        case "location":
+          data.landing.locationLead = block.props.lead || "";
+          data.contact.address = block.props.address || "";
+          data.contact.mapsEmbed = block.props.mapsEmbed || "";
+          break;
+        case "contact":
+          data.landing.formLead = block.props.lead || "";
+          data.contact.whatsappPhone = block.props.whatsappPhone || "";
+          break;
+        case "text":
+          data.extraBlocks = data.extraBlocks || [];
+          data.extraBlocks.push({
+            id: block.id,
+            title: block.props.title || "",
+            text: block.props.text || ""
+          });
+          break;
+      }
+    });
+    return data;
+  }
+
   // Defaults: contenido inicial listo para publicar.
   var DEFAULTS = {
-    version: 1,
+    version: 2,
     brand: {
       name: "Shinseikan Karate",
       tagline: "Asociación de Okinawa Karate Do",
@@ -173,7 +332,9 @@
         }
       ]
     },
-    extraBlocks: []
+    extraBlocks: [],
+    // Nueva estructura de bloques para el Editor Visual
+    pageBlocks: []
   };
 
   function isObject(value) {
@@ -203,14 +364,34 @@
     load: function () {
       try {
         var raw = window.localStorage.getItem(KEY);
-        if (!raw) return JSON.parse(JSON.stringify(DEFAULTS));
-        var parsed = JSON.parse(raw);
-        return mergeDeep(DEFAULTS, parsed);
+        var data;
+        if (!raw) {
+          data = JSON.parse(JSON.stringify(DEFAULTS));
+        } else {
+          var parsed = JSON.parse(raw);
+          data = mergeDeep(DEFAULTS, parsed);
+        }
+        // Inicializar pageBlocks si no existe (migración desde v1)
+        if (!data.pageBlocks || data.pageBlocks.length === 0) {
+          data.pageBlocks = convertLegacyToBlocks(data);
+        }
+        return data;
       } catch (e) {
         return JSON.parse(JSON.stringify(DEFAULTS));
       }
     },
     save: function (data) {
+      // Antes de guardar, sincronizar legacy con pageBlocks
+      if (data.pageBlocks && data.pageBlocks.length > 0) {
+        // Crear una copia limpia para legacy
+        var cleanData = JSON.parse(JSON.stringify(data));
+        cleanData.extraBlocks = [];
+        convertBlocksToLegacy(data.pageBlocks, cleanData);
+        // Copiar valores legacy de vuelta al data original
+        data.landing = cleanData.landing;
+        data.contact = cleanData.contact;
+        data.extraBlocks = cleanData.extraBlocks;
+      }
       window.localStorage.setItem(KEY, JSON.stringify(data));
     },
     reset: function () {
@@ -221,7 +402,10 @@
     },
     setAuthed: function (value) {
       window.localStorage.setItem(AUTH_KEY, value ? "1" : "0");
-    }
+    },
+    // Funciones públicas para el editor visual
+    convertLegacyToBlocks: convertLegacyToBlocks,
+    convertBlocksToLegacy: convertBlocksToLegacy
   };
 })();
 

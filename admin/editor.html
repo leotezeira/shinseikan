@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Editor Visual | Shinseikan Karate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Serif+JP:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link rel="stylesheet" href="../css/visual-editor.css" />
+  </head>
+
+  <body class="admin-body">
+    <header class="site-header admin-header">
+      <div class="container header-inner">
+        <a class="brand" href="../" aria-label="Volver al sitio">
+          <img id="editorLogo" class="brand-logo" alt="Shinseikan Karate" />
+          <div class="brand-text">
+            <span class="brand-name">Editor Visual</span>
+            <span class="brand-tagline">Shinseikan Karate</span>
+          </div>
+        </a>
+        <div class="admin-header-actions">
+          <a class="btn btn-ghost btn-small" href="./">Volver al Admin</a>
+          <button class="btn btn-ghost btn-small" id="btnLogout" type="button">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main" style="padding: 0;">
+      <!-- Toolbar superior -->
+      <div class="visual-editor-toolbar">
+        <h2>Editor de Página</h2>
+        <div class="visual-editor-actions">
+          <span id="editorStatus" class="editor-status saved">Guardado</span>
+          <button class="btn btn-ghost btn-small" id="btnUndo" type="button" title="Deshacer (Ctrl+Z)" disabled>↶ Deshacer</button>
+          <button class="btn btn-ghost btn-small" id="btnRedo" type="button" title="Rehacer (Ctrl+Y)" disabled>↷ Rehacer</button>
+          <button class="btn btn-dark btn-small" id="btnSaveVisual" type="button">💾 Guardar</button>
+          <button class="btn btn-ghost btn-small" id="btnResetVisual" type="button">🔄 Restaurar</button>
+        </div>
+      </div>
+
+      <!-- Contenedor principal del editor -->
+      <div class="container" style="padding: 16px;">
+        <div class="visual-editor-container">
+          <!-- Panel izquierdo: Biblioteca y lista de bloques -->
+          <aside class="blocks-panel">
+            <h3>📦 Agregar Bloques</h3>
+            <div class="blocks-library">
+              <button class="add-block-btn" data-add-block="hero">
+                <span class="icon">🎯</span>
+                <span>Hero / Portada</span>
+              </button>
+              <button class="add-block-btn" data-add-block="about">
+                <span class="icon">📖</span>
+                <span>Sobre / About</span>
+              </button>
+              <button class="add-block-btn" data-add-block="disciplines">
+                <span class="icon">🥋</span>
+                <span>Disciplinas</span>
+              </button>
+              <button class="add-block-btn" data-add-block="classes">
+                <span class="icon">👥</span>
+                <span>Clases / Grupos</span>
+              </button>
+              <button class="add-block-btn" data-add-block="belts">
+                <span class="icon">⚫</span>
+                <span>Cintos</span>
+              </button>
+              <button class="add-block-btn" data-add-block="location">
+                <span class="icon">📍</span>
+                <span>Ubicación</span>
+              </button>
+              <button class="add-block-btn" data-add-block="contact">
+                <span class="icon">📞</span>
+                <span>Contacto</span>
+              </button>
+              <button class="add-block-btn" data-add-block="text">
+                <span class="icon">📝</span>
+                <span>Texto</span>
+              </button>
+              <button class="add-block-btn" data-add-block="image">
+                <span class="icon">🖼️</span>
+                <span>Imagen</span>
+              </button>
+              <button class="add-block-btn" data-add-block="html">
+                <span class="icon">💻</span>
+                <span>HTML Personalizado</span>
+              </button>
+            </div>
+
+            <h3>📋 Bloques en la Página</h3>
+            <div class="blocks-list-container">
+              <div id="blocksList"></div>
+            </div>
+          </aside>
+
+          <!-- Panel central: Vista previa -->
+          <section class="preview-area">
+            <div class="preview-toolbar">
+              <h3>👁️ Vista Previa</h3>
+              <div class="breakpoint-toggle">
+                <button class="breakpoint-btn active" data-breakpoint="desktop" title="Escritorio">🖥️</button>
+                <button class="breakpoint-btn" data-breakpoint="tablet" title="Tablet">📱</button>
+                <button class="breakpoint-btn" data-breakpoint="mobile" title="Móvil">📲</button>
+              </div>
+            </div>
+            <div class="preview-frame preview-desktop" id="previewFrame">
+              <div id="previewContent"></div>
+            </div>
+          </section>
+
+          <!-- Panel derecho: Propiedades -->
+          <aside class="properties-panel">
+            <h3>⚙️ Propiedades</h3>
+            <div id="propertiesPanel">
+              <p class="empty-state">Seleccioná un bloque para editar sus propiedades.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/visual-editor.js"></script>
+    <script>
+      // Inicialización básica similar al admin
+      (function () {
+        "use strict";
+        
+        var qs = Shinseikan.qs;
+        var ADMIN_USER = "admin";
+        var ADMIN_PASS = "karatedo";
+
+        // Verificar autenticación
+        if (!Shinseikan.Storage.isAuthed()) {
+          window.location.href = "./";
+        }
+
+        // Cargar logo
+        var data = Shinseikan.Storage.load();
+        var editorLogo = qs("#editorLogo");
+        if (editorLogo) {
+          editorLogo.src = data.brand.logoDataUrl || Shinseikan.defaultLogoDataUrl();
+          editorLogo.alt = data.brand.logoAlt || "Shinseikan Karate";
+        }
+
+        // Logout
+        var btnLogout = qs("#btnLogout");
+        if (btnLogout) {
+          btnLogout.addEventListener("click", function () {
+            Shinseikan.Storage.setAuthed(false);
+            window.location.href = "./";
+          });
+        }
+
+        // Inicializar el editor visual
+        document.addEventListener("DOMContentLoaded", function () {
+          Shinseikan.VisualEditor.init();
+        });
+      })();
+    </script>
+  </body>
+</html>

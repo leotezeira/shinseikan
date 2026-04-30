@@ -309,6 +309,336 @@
   }
 
   function render(data) {
+    // Si hay pageBlocks (nuevo formato), usar renderizado por bloques
+    if (data.pageBlocks && data.pageBlocks.length > 0) {
+      renderBlocksPage(data);
+    } else {
+      // Formato legacy
+      renderLegacyPage(data);
+    }
+  }
+
+  function renderBlocksPage(data) {
+    renderLogo(data);
+    setText("brandName", data.brand.name);
+    setText("brandTagline", data.brand.tagline);
+    setText("footerName", data.brand.name);
+    setText("footerSub", data.brand.tagline);
+    setText("waPhoneText", prettyPhone(data.contact.whatsappPhone));
+    setText("waPhoneFooterText", prettyPhone(data.contact.whatsappPhone));
+    setHref("mapsCta", data.contact.mapsUrl);
+    setText("footerAddress", shortAddress(data.contact.address));
+    
+    var map = qs("#mapFrame");
+    if (map) map.src = data.contact.mapsEmbed || "";
+    
+    // Renderizar bloques en el contenedor principal
+    var mainContent = qs("#mainContent");
+    if (!mainContent) {
+      console.warn("No se encontró #mainContent, usando fallback");
+      return;
+    }
+    
+    mainContent.innerHTML = "";
+    data.pageBlocks.forEach(function(block) {
+      var section = renderBlockToDOM(block, data);
+      if (section) mainContent.appendChild(section);
+    });
+    
+    setupNav();
+    setupReveal();
+    setText("year", new Date().getFullYear());
+  }
+
+  function renderBlockToDOM(block, data) {
+    var props = block.props || {};
+    var section = document.createElement("section");
+    section.className = "section";
+    section.dataset.blockId = block.id;
+    
+    switch (block.type) {
+      case "hero":
+        section.id = "hero";
+        section.className = "section hero-section";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="hero-grid">' +
+          '<div class="hero-content reveal">' +
+          '<p class="kicker"></p>' +
+          '<h1 class="hero-title"></h1>' +
+          '<p class="hero-subtitle"></p>' +
+          '<div class="cta-group">' +
+          '<a class="btn btn-primary" href="#" id="heroPrimaryCta"></a>' +
+          '<a class="btn btn-ghost" href="#" id="heroSecondaryCta"></a>' +
+          '</div>' +
+          '<ul class="bullets" id="heroBullets"></ul>' +
+          '</div>' +
+          '<div class="hero-card reveal">' +
+          '<div class="hero-card-inner">' +
+          '<h3 class="hero-card-title"></h3>' +
+          '<p class="hero-card-sub"></p>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+        
+        setText("heroKicker", props.kicker);
+        setText("heroTitle", props.title);
+        setText("heroSubtitle", props.subtitle);
+        setHref("heroPrimaryCta", "#contacto");
+        setText("heroPrimaryCta", props.primaryCta || "Inscribirme ahora");
+        setHref("heroSecondaryCta", "#disciplinas");
+        setText("heroSecondaryCta", props.secondaryCta || "Ver disciplinas");
+        
+        var bullets = qs("#heroBullets", section);
+        if (bullets && props.bullets) {
+          bullets.innerHTML = "";
+          props.bullets.forEach(function(t) {
+            var li = document.createElement("li");
+            li.textContent = t;
+            bullets.appendChild(li);
+          });
+        }
+        
+        setText("heroCardTitle", "Dojo " + data.brand.name, section);
+        setText("heroCardSub", "San Vicente · Córdoba", section);
+        break;
+      
+      case "about":
+        section.id = "about";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title"></h2>' +
+          '<p class="section-lead"></p></div>' +
+          '<div class="about-grid" id="aboutBlocksGrid"></div>' +
+          '</div>';
+        
+        setText("aboutTitle", props.title, section);
+        setText("aboutLead", props.lead, section);
+        
+        var grid = qs("#aboutBlocksGrid", section);
+        if (grid && props.blocks) {
+          props.blocks.forEach(function(b) {
+            var card = document.createElement("article");
+            card.className = "card reveal";
+            card.innerHTML = '<h3 class="card-title"></h3><p class="card-text"></p>';
+            card.querySelector(".card-title").textContent = b.title || "";
+            card.querySelector(".card-text").textContent = b.text || "";
+            grid.appendChild(card);
+          });
+        }
+        break;
+      
+      case "disciplines":
+        section.id = "disciplinas";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title">Disciplinas</h2>' +
+          '<p class="section-lead"></p></div>' +
+          '<div class="grid-3" id="disciplinesGrid"></div>' +
+          '</div>';
+        
+        setText("disciplinesLead", props.lead, section);
+        
+        var discGrid = qs("#disciplinesGrid", section);
+        if (discGrid && props.items) {
+          props.items.forEach(function(d) {
+            var card = document.createElement("article");
+            card.className = "card discipline-card reveal";
+            card.innerHTML =
+              '<div class="disc-icon" aria-hidden="true">' + (d.icon || "道") + '</div>' +
+              '<h3 class="card-title"></h3>' +
+              '<p class="card-text"></p>';
+            card.querySelector(".card-title").textContent = d.title || "";
+            card.querySelector(".card-text").textContent = d.text || "";
+            discGrid.appendChild(card);
+          });
+        }
+        break;
+      
+      case "classes":
+        section.id = "clases";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title">Clases</h2>' +
+          '<p class="section-lead"></p>' +
+          '<p class="days"></p></div>' +
+          '<div class="grid-3" id="classesGroups"></div>' +
+          '<div class="cta-center"><a class="btn btn-primary" href="#contacto" id="classesWaCta">Consultar horarios</a></div>' +
+          '</div>';
+        
+        setText("classesLead", props.lead, section);
+        setText("classesDays", props.days, section);
+        
+        var classesGrid = qs("#classesGroups", section);
+        if (classesGrid && props.groups) {
+          props.groups.forEach(function(g) {
+            var card = document.createElement("article");
+            card.className = "card reveal";
+            card.innerHTML = '<h3 class="card-title"></h3><p class="card-text"></p>';
+            card.querySelector(".card-title").textContent = g.title || "";
+            card.querySelector(".card-text").textContent = g.text || "";
+            classesGrid.appendChild(card);
+          });
+        }
+        
+        var waLink = Shinseikan.buildWaLink(data.contact.whatsappPhone, "Hola, quiero información sobre clases.");
+        setHref("classesWaCta", waLink, section);
+        break;
+      
+      case "belts":
+        section.id = "cintos";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title">Graduaciones</h2>' +
+          '<p class="section-lead"></p></div>' +
+          '<div class="belts-row" id="beltsRow"></div>' +
+          '</div>';
+        
+        setText("beltsLead", props.lead, section);
+        
+        var beltsRow = qs("#beltsRow", section);
+        if (beltsRow && props.items) {
+          props.items.forEach(function(b) {
+            var el = document.createElement("div");
+            el.className = "belt";
+            el.style.setProperty("--belt", b.color || "#eee");
+            var swatchBorder = b.border || "rgba(0,0,0,.12)";
+            el.innerHTML = '<div class="belt-swatch"></div><p class="belt-name"></p>';
+            el.querySelector(".belt-swatch").style.borderBottomColor = swatchBorder;
+            el.querySelector(".belt-name").textContent = b.name || "";
+            beltsRow.appendChild(el);
+          });
+        }
+        break;
+      
+      case "location":
+        section.id = "ubicacion";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title">Ubicación</h2>' +
+          '<p class="section-lead"></p>' +
+          '<p class="address"></p></div>' +
+          '<div class="map-container"><iframe id="mapFrame" class="map-frame" loading="lazy" allowfullscreen></iframe></div>' +
+          '<div class="cta-center"><a class="btn btn-primary" href="#" id="mapsCta" target="_blank" rel="noopener">Cómo llegar</a>' +
+          '<a class="btn btn-ghost" href="#contacto" id="locationWaCta">Contactar</a></div>' +
+          '</div>';
+        
+        setText("locationLead", props.lead, section);
+        setText("locationAddress", props.address, section);
+        
+        var mapFrame = qs("#mapFrame", section);
+        if (mapFrame) mapFrame.src = props.mapsEmbed || "";
+        
+        setHref("mapsCta", data.contact.mapsUrl, section);
+        var waLoc = Shinseikan.buildWaLink(data.contact.whatsappPhone, "Hola, quiero saber más sobre la ubicación del dojo.");
+        setHref("locationWaCta", waLoc, section);
+        break;
+      
+      case "contact":
+        section.id = "contacto";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal"><h2 class="section-title">Contacto</h2>' +
+          '<p class="section-lead"></p></div>' +
+          '<div class="contact-grid">' +
+          '<form class="contact-form reveal" id="signupForm">' +
+          '<div class="field"><label for="fName">Nombre</label><input type="text" id="fName" required /></div>' +
+          '<div class="field"><label for="fPhone">Teléfono</label><input type="tel" id="fPhone" /></div>' +
+          '<div class="field"><label for="fEmail">Email</label><input type="email" id="fEmail" /></div>' +
+          '<button class="btn btn-primary" type="submit">Enviar consulta</button>' +
+          '</form>' +
+          '<div class="contact-info reveal">' +
+          '<h3>WhatsApp</h3>' +
+          '<p><a href="#" id="waFooterLink" target="_blank" rel="noopener"></a></p>' +
+          '<h3>Email</h3>' +
+          '<p><a href="mailto:info@shinseikan.com.ar">info@shinseikan.com.ar</a></p>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+        
+        setText("formLead", props.lead, section);
+        setText("waPhoneFooterText", prettyPhone(data.contact.whatsappPhone), section);
+        
+        var waContact = Shinseikan.buildWaLink(data.contact.whatsappPhone, "Hola, quiero información sobre clases en Shinseikan Karate.");
+        setHref("waFooterLink", waContact, section);
+        
+        // Setup form
+        (function() {
+          var form = qs("#signupForm", section);
+          if (form) {
+            form.addEventListener("submit", function(ev) {
+              ev.preventDefault();
+              var name = Shinseikan.safeText(qs("#fName").value);
+              var phone = Shinseikan.safeText(qs("#fPhone").value);
+              var email = Shinseikan.safeText(qs("#fEmail").value);
+              var msg = "Hola, soy " + (name || "—") + ". Quiero inscribirme en Shinseikan Karate." +
+                (phone ? " Tel: " + phone + "." : "") +
+                (email ? " Email: " + email + "." : "") +
+                " ¿Me pasan horarios y valores?";
+              window.location.href = Shinseikan.buildWaLink(data.contact.whatsappPhone, msg);
+            });
+          }
+        })();
+        break;
+      
+      case "text":
+        section.className = "section";
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="section-head reveal">' +
+          (props.title ? '<h2 class="section-title"></h2>' : '') +
+          '<p class="section-lead"></p>' +
+          '</div>' +
+          '</div>';
+        
+        if (props.title) setText("section-title", props.title, section);
+        setText("section-lead", props.text, section);
+        break;
+      
+      case "image":
+        section.className = "section image-section";
+        var imgHtml = '<img src="' + (props.src || "") + '" alt="' + (props.alt || "") + '" />';
+        if (props.link) {
+          imgHtml = '<a href="' + props.link + '" target="_blank" rel="noopener">' + imgHtml + '</a>';
+        }
+        section.innerHTML =
+          '<div class="container">' +
+          '<div class="image-wrapper reveal">' + imgHtml + '</div>' +
+          (props.title ? '<h3 class="image-title"></h3>' : '') +
+          (props.caption ? '<p class="image-caption"></p>' : '') +
+          '</div>';
+        
+        if (props.title) setText("image-title", props.title, section);
+        if (props.caption) setText("image-caption", props.caption, section);
+        break;
+      
+      case "html":
+        section.className = "section html-section";
+        section.innerHTML = '<div class="container">' + props.htmlContent + '</div>';
+        break;
+      
+      default:
+        section.className = "section";
+        section.innerHTML = '<div class="container"><p>Bloque desconocido: ' + block.type + '</p></div>';
+    }
+    
+    return section;
+  }
+
+  function setText(id, value, parent) {
+    var el = parent ? parent.querySelector("#" + id) : document.querySelector("#" + id);
+    if (!el) return;
+    el.textContent = String(value || "");
+  }
+
+  function setHref(id, value, parent) {
+    var el = parent ? parent.querySelector("#" + id) : document.querySelector("#" + id);
+    if (!el) return;
+    el.href = String(value || "#");
+  }
+
+  function renderLegacyPage(data) {
     renderLogo(data);
 
     setText("brandName", data.brand.name);
@@ -398,7 +728,7 @@
         currentCategory = target.dataset.value || "Todos";
         var search = Shinseikan.safeText(qs("#productSearch").value).toLowerCase();
         renderProducts(data, { category: currentCategory, search: search });
-        setupReveal(); // chips pueden volver a renderizar productos
+        setupReveal();
       });
     }
 
